@@ -1,2 +1,867 @@
 # Happy_birthday_Karan_
 A digital universe built with love, sports cars, and bulletproof loyalty to celebrate Karan's 20th birthday. Bridging Lahore to Mohali, proof that distance and borders can never fade the bond of true bestus! ❤️✨
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Karan! | Lahore To Mohali</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js (r128 - stable for WebViews) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #060608;
+            --card-bg: rgba(20, 20, 25, 0.85);
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --red-action: #e63946;
+            --text-light: #f1f1f1;
+            --text-dim: #9999a1;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Ambient 3D Three Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: auto;
+        }
+
+        /* 2D Firework Canvas overlay */
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Main UI Container */
+        .app-wrapper {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px;
+            padding-bottom: 90px; /* space for mobile nav */
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .gold-border {
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        /* Buttons */
+        .btn-gold {
+            background: linear-gradient(135deg, #d4af37, #aa7c11);
+            color: #000;
+            font-weight: 800;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px var(--gold-glow);
+            transition: transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-gold:active {
+            transform: scale(0.96);
+        }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-light);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:active {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* Ignition Screen Overlay */
+        #ignition-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-center: center;
+        }
+
+        .rev-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 2px dashed var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation: spin 12s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Countdown Grid */
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .timer-box {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 5px;
+        }
+
+        .timer-num {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--gold);
+            font-family: monospace;
+        }
+
+        .timer-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media(min-width: 600px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .photo-card {
+            background: rgba(10, 10, 12, 0.9);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .photo-img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            display: block;
+            background: #111;
+        }
+
+        .photo-fallback {
+            width: 100%;
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #181820 0%, #08080c 100%);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .photo-desc {
+            padding: 14px;
+        }
+
+        .photo-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .photo-caption {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            background: rgba(10, 10, 12, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            width: 25%;
+        }
+
+        .nav-item.active {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+        }
+
+        /* Letter Styling */
+        .letter-content p {
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: #ddd;
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        /* Action Range */
+        .target-box {
+            width: 100%;
+            height: 250px;
+            background: #000;
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: crosshair;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .bullseye {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px red solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Sound Button Floating */
+        .sound-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 200;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .tab-section {
+            display: none;
+        }
+
+        .tab-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Sound Switch -->
+    <button id="sound-btn" class="sound-btn" onclick="toggleAudio()">
+        <i id="sound-icon" class="fa-solid fa-volume-xmark"></i>
+    </button>
+
+    <!-- 3D Three.js Background Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- 2D Fireworks Sparks Overlay -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <!-- ================= IGNITION SCREEN (START) ================= -->
+    <div id="ignition-screen">
+        <div class="rev-circle">
+            <i class="fa-solid fa-gauge-high" style="font-size: 2.2rem; color: var(--gold);"></i>
+        </div>
+        <h1 style="font-size: 1.8rem; font-weight: 900; color: #fff; letter-spacing: 2px; margin-bottom: 8px;">
+            SYSTEM <span style="color: var(--gold);">KARAN</span>
+        </h1>
+        <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 24px; max-width: 280px; line-height: 1.4;">
+            Mohali's Style Icon • Lahore to Mohali Connection • Born 12 August 2006
+        </p>
+
+        <button onclick="startApp()" class="btn-gold">
+            <i class="fa-solid fa-key"></i> Start Engine & Celebrate
+        </button>
+        <p style="font-size: 0.65rem; color: #666; margin-top: 15px; italic">Turn up media volume for sound!</p>
+    </div>
+
+    <!-- ================= MAIN APPLICATION ================= -->
+    <div class="app-wrapper">
+
+        <!-- HEADER BANNER -->
+        <div class="glass-card gold-border" style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <span style="font-size: 0.65rem; color: var(--gold); font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">12th August Special</span>
+                <h2 style="font-size: 1.2rem; font-weight: 800; color: #fff;">KARAN</h2>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 0.7rem; color: var(--text-dim); font-family: monospace;">LAHORE 🇵🇰 ➔ MOHALI 🇮🇳</span>
+            </div>
+        </div>
+
+        <!-- ================= TAB 1: HUB ================= -->
+        <div id="tab-hub" class="tab-section active">
+            <!-- Countdown Timer Card -->
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.75rem; font-weight: bold; color: var(--gold);"><i class="fa-solid fa-clock"></i> BIRTHDAY COUNTDOWN</span>
+                    <span style="font-size: 0.65rem; color: var(--text-dim);">12 AUGUST 2006</span>
+                </div>
+
+                <div class="timer-grid">
+                    <div class="timer-box"><div id="t-days" class="timer-num">00</div><div class="timer-label">Days</div></div>
+                    <div class="timer-box"><div id="t-hours" class="timer-num">00</div><div class="timer-label">Hours</div></div>
+                    <div class="timer-box"><div id="t-mins" class="timer-num">00</div><div class="timer-label">Mins</div></div>
+                    <div class="timer-box"><div id="t-secs" class="timer-num">00</div><div class="timer-label">Secs</div></div>
+                </div>
+            </div>
+
+            <!-- Hero Celebration Card -->
+            <div class="glass-card" style="text-align: center; padding: 30px 20px;">
+                <i class="fa-solid fa-crown" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 12px;"></i>
+                <h1 style="font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; color: #fff;">HAPPY BIRTHDAY, KARAN!</h1>
+                <p style="font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 20px;">
+                    To the world's best bestu from Mohali! Turning 20 with pure style, sports cars, bulletproof loyalty, and endless fun memories.
+                </p>
+                <button onclick="switchTab('letter')" class="btn-gold">
+                    <i class="fa-solid fa-envelope-open-text"></i> Read Special Letter
+                </button>
+            </div>
+
+            <!-- 3D Simulator Color Controls -->
+            <div class="glass-card">
+                <span style="font-size: 0.75rem; font-weight: bold; color: #fff; display: block; margin-bottom: 10px;">
+                    <i class="fa-solid fa-car" style="color: var(--gold);"></i> 3D Audi Color Tuner
+                </span>
+                <p style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 12px;">Touch & drag screen to rotate 3D sports car!</p>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-outline" style="flex:1;" onclick="setCarColor(0x111111)">Matte Black</button>
+                    <button class="btn-outline" style="flex:1;" onclick="setCarColor(0xd4af37)">Gold Plated</button>
+                    <button class="btn-outline" style="flex:1;" onclick="setCarColor(0xc0c0c0)">Audi Silver</button>
+                </div>
+            </div>
+
+            <!-- Bestu Compliment Generator -->
+            <div class="glass-card" style="text-align: center;">
+                <span style="font-size: 0.75rem; font-weight: bold; color: var(--gold);">THE BESTU COMPLIMENT BOOTH</span>
+                <div id="compliment-text" style="font-size: 0.9rem; font-style: italic; margin: 15px 0; color: #fff; min-height: 45px;">
+                    "Your style is top-tier and your heart is pure gold!"
+                </div>
+                <button onclick="nextCompliment()" class="btn-outline">
+                    <i class="fa-solid fa-dice"></i> Tap for New Compliment
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= TAB 2: GALLERY ================= -->
+        <div id="tab-gallery" class="tab-section">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff;">MOHALI'S STYLE ICON</h3>
+                <p style="font-size: 0.75rem; color: var(--text-dim);">The 5 handpicked moments from Karan</p>
+            </div>
+
+            <div class="gallery-grid">
+                <!-- Image 1 -->
+                <div class="photo-card">
+                    <img src="Karan image 1.jpg" class="photo-img" onerror="this.replaceWith(createFallback('Karan image 1.jpg', 'Sharp Suit Mirror Selfie'))">
+                    <div class="photo-desc">
+                        <div class="photo-title">01 / The Sharp Pinstripe</div>
+                        <div class="photo-caption">"Double-breasted suit, crisp fade cut, and absolute confidence in the mirror!"</div>
+                    </div>
+                </div>
+
+                <!-- Image 2 -->
+                <div class="photo-card">
+                    <img src="Karan image 2.jpg" class="photo-img" onerror="this.replaceWith(createFallback('Karan image 2.jpg', 'Leaning on Audi A6'))">
+                    <div class="photo-desc">
+                        <div class="photo-title">02 / Audi Night Pose</div>
+                        <div class="photo-caption">"Posing next to his sleek silver sports car. Pure high-octane luxury style."</div>
+                    </div>
+                </div>
+
+                <!-- Image 3 -->
+                <div class="photo-card">
+                    <img src="Karan image 3.jpg" class="photo-img" onerror="this.replaceWith(createFallback('Karan image 3.jpg', 'Cinematic Audi Portrait'))">
+                    <div class="photo-desc">
+                        <div class="photo-title">03 / Cinematic Vibe</div>
+                        <div class="photo-caption">"Looks straight out of an action movie. Mohali's coolest brother!"</div>
+                    </div>
+                </div>
+
+                <!-- Image 4 -->
+                <div class="photo-card">
+                    <img src="Karan image 4.jpg" class="photo-img" onerror="this.replaceWith(createFallback('Karan image 4.jpg', 'White Shirt Calm Pose'))">
+                    <div class="photo-desc">
+                        <div class="photo-title">04 / Pure Elegance</div>
+                        <div class="photo-caption">"Clean white shirt, relaxed posture, simple and timelessly handsome."</div>
+                    </div>
+                </div>
+
+                <!-- Image 5 -->
+                <div class="photo-card" style="grid-column: 1 / -1;">
+                    <img src="Karan image 5.jpg" class="photo-img" style="height: 300px;" onerror="this.replaceWith(createFallback('Karan image 5.jpg', 'You Are Beautiful Mirror'))">
+                    <div class="photo-desc">
+                        <div class="photo-title">05 / "You Are Beautiful"</div>
+                        <div class="photo-caption">"The golden frame mirror says it all! Best flirting partner bringing laughter."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 3: LETTER ================= -->
+        <div id="tab-letter" class="tab-section">
+            <div class="glass-card gold-border" style="padding: 24px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 0.65rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">FROM LAHORE WITH LOVE</span>
+                    <h2 style="font-size: 1.4rem; font-weight: 900; color: #fff; margin-top: 4px;">DEAREST KARAN,</h2>
+                    <p style="font-size: 0.7rem; color: var(--text-dim);">My Absolute Bestie Bestu</p>
+                </div>
+
+                <div class="letter-content">
+                    <p>
+                        They say borders are etched with ink and maps draw lines between us. But true friendship doesn't care about borders or religions. From my side here in Lahore, Pakistan to yours in Mohali, Punjab 🇮🇳, our connection is pure, warm, and unbreakable. You are Hindu, I am Muslim, but honestly that doesn't matter even a tiny bit—our hearts share the exact same language of laughter and care.
+                    </p>
+                    <p>
+                        You are my absolute <b>bestie bestu</b>. When you sent me your photos, you looked so incredibly handsome! I love how you pose next to your silver Audi, standing tall in your double-breasted suit, but I love the humble, insanely funny best friend inside even more.
+                    </p>
+                    <p>
+                        I know you love sports cars, guns, bullets, and black color aesthetics. You flirt sometimes just for fun, and I tease you right back with endless laughter! But what makes you unique is your bulletproof loyalty and golden heart.
+                    </p>
+                    <p>
+                        On your 20th Birthday (12th August 2006), I pray your life moves as fast as a sports car, as powerful as a bullet, and full of peace, success, and endless joy!
+                    </p>
+                </div>
+
+                <div style="text-align: center; border-top: 1px solid var(--border); padding-top: 15px; margin-top: 20px;">
+                    <span style="font-size: 0.75rem; color: var(--gold); font-weight: bold;">ALWAYS YOUR BESTIE BESTU 🇵🇰</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 4: ACTION ZONE ================= -->
+        <div id="tab-action" class="tab-section">
+            <div class="glass-card text-center">
+                <h3 style="font-size: 1.1rem; color: #fff; font-weight: 800;">BULLET WISH TARGET RANGE</h3>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">Tap the crosshair box to fire bullet wishes and spark golden fireworks!</p>
+
+                <div id="target-box" class="target-box" onclick="fireBullet(event)">
+                    <div class="bullseye">
+                        <i class="fa-solid fa-crosshairs" style="color: red; font-size: 2rem;"></i>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; font-size: 0.8rem; color: var(--gold); font-family: monospace;">
+                    BULLET WISHES FIRED: <span id="hit-count">0</span>
+                </div>
+            </div>
+
+            <!-- Virtual Candle -->
+            <div class="glass-card text-center">
+                <h3 style="font-size: 1rem; color: #fff; font-weight: 800; margin-bottom: 10px;">MAKE A SECRET WISH</h3>
+                <div id="flame" style="width: 14px; height: 30px; background: orange; margin: 0 auto; border-radius: 50% 50% 20% 20%; box-shadow: 0 0 15px orange; animation: pulse 0.5s infinite;"></div>
+                <div style="width: 8px; height: 35px; background: #d4af37; margin: 0 auto;"></div>
+                <button onclick="blowCandle()" class="btn-gold" style="margin-top: 15px;">
+                    <i class="fa-solid fa-wind"></i> Blow Candle Flame
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= BOTTOM NAVIGATION ================= -->
+    <nav class="bottom-nav">
+        <button id="nav-hub" class="nav-item active" onclick="switchTab('hub')">
+            <i class="fa-solid fa-compass"></i>
+            <span>Hub</span>
+        </button>
+        <button id="nav-gallery" class="nav-item" onclick="switchTab('gallery')">
+            <i class="fa-solid fa-images"></i>
+            <span>Gallery</span>
+        </button>
+        <button id="nav-letter" class="nav-item" onclick="switchTab('letter')">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <span>Letter</span>
+        </button>
+        <button id="nav-action" class="nav-item" onclick="switchTab('action')">
+            <i class="fa-solid fa-crosshairs"></i>
+            <span>Action</span>
+        </button>
+    </nav>
+
+    <!-- ================= SCRIPT LOGIC ================= -->
+    <script>
+        // Audio Synthesizer (Acode & Webview Friendly)
+        let audioEnabled = false;
+        let audioCtx = null;
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (audioEnabled) {
+                icon.className = "fa-solid fa-volume-high";
+                playChime();
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+            }
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playGunSound() {
+            if (!audioEnabled) return;
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.22);
+        }
+
+        function playChime() {
+            if (!audioEnabled) return;
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.35);
+        }
+
+        // Navigation Switcher
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('nav-' + tabName).classList.add('active');
+            playChime();
+        }
+
+        // Start App
+        function startApp() {
+            document.getElementById('ignition-screen').style.display = 'none';
+            toggleAudio();
+            initThree();
+        }
+
+        // Compliments
+        const compliments = [
+            "Your style in Mohali is top-tier and your heart is pure gold!",
+            "You pose with your Audi like a complete cinematic movie hero!",
+            "Double-breasted suit perfection—nobody carries it better than Karan.",
+            "Bulletproof loyalty and the best bestu anyone could ever ask for!",
+            "From Lahore to Mohali, true friendship knows no borders!"
+        ];
+        let compIdx = 0;
+        function nextCompliment() {
+            compIdx = (compIdx + 1) % compliments.length;
+            document.getElementById('compliment-text').innerText = `"${compliments[compIdx]}"`;
+            playChime();
+        }
+
+        // Image Fallback Generator
+        function createFallback(filename, caption) {
+            const div = document.createElement('div');
+            div.className = 'photo-fallback';
+            div.innerHTML = `
+                <i class="fa-solid fa-image" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 10px;"></i>
+                <div style="font-size: 0.8rem; font-weight: bold; color: #fff;">${filename}</div>
+                <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 4px;">[${caption}]</div>
+            `;
+            return div;
+        }
+
+        // Countdown Clock (12 August 2006 Birthday Target)
+        function updateTimer() {
+            const now = new Date();
+            let targetYear = now.getFullYear();
+            let targetDate = new Date(`August 12, ${targetYear} 00:00:00`);
+
+            if (now > targetDate) {
+                // If past Aug 12 this year, set to next year
+                targetDate = new Date(`August 12, ${targetYear + 1} 00:00:00`);
+            }
+
+            const diff = targetDate - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const mins = Math.floor((diff / 1000 / 60) % 60);
+            const secs = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('t-days').innerText = String(days).padStart(2, '0');
+            document.getElementById('t-hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('t-mins').innerText = String(mins).padStart(2, '0');
+            document.getElementById('t-secs').innerText = String(secs).padStart(2, '0');
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Target Bullet Action
+        let hitCount = 0;
+        function fireBullet(e) {
+            hitCount++;
+            document.getElementById('hit-count').innerText = hitCount;
+            playGunSound();
+            spawnSparks(e.clientX, e.clientY);
+        }
+
+        function blowCandle() {
+            document.getElementById('flame').style.display = 'none';
+            playChime();
+            for(let i=0; i<6; i++) {
+                setTimeout(() => {
+                    spawnSparks(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                }, i * 200);
+            }
+        }
+
+        // 2D Sparks Particle System
+        const fCanvas = document.getElementById('fireworks-canvas');
+        const fCtx = fCanvas.getContext('2d');
+        let sparks = [];
+
+        function resizeFCanvas() {
+            fCanvas.width = window.innerWidth;
+            fCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeFCanvas);
+        resizeFCanvas();
+
+        function spawnSparks(x, y) {
+            for(let i=0; i<25; i++) {
+                sparks.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    life: 1.0,
+                    color: i % 2 === 0 ? '#d4af37' : '#e63946'
+                });
+            }
+        }
+
+        function renderSparks() {
+            fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+            sparks = sparks.filter(s => s.life > 0);
+            sparks.forEach(s => {
+                s.x += s.vx;
+                s.y += s.vy;
+                s.life -= 0.03;
+                fCtx.fillStyle = s.color;
+                fCtx.globalAlpha = Math.max(s.life, 0);
+                fCtx.beginPath();
+                fCtx.arc(s.x, s.y, 3, 0, Math.PI * 2);
+                fCtx.fill();
+            });
+            requestAnimationFrame(renderSparks);
+        }
+        renderSparks();
+
+        // 3D Three.js Sports Car Scene (WebGL WebView Safe)
+        let scene, camera, renderer, carMesh, carMat;
+        let isDragging = false, prevX = 0;
+
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 2.2, 6);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const light1 = new THREE.DirectionalLight(0xd4af37, 1.2);
+            light1.position.set(5, 10, 5);
+            scene.add(light1);
+
+            const light2 = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(light2);
+
+            // Create Stylized Sports Car Group
+            carMesh = new THREE.Group();
+
+            carMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.2, metalness: 0.8 });
+            const glassMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.1, opacity: 0.8, transparent: true });
+
+            // Body Chassis
+            const body = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 1.6), carMat);
+            body.position.y = 0.4;
+            carMesh.add(body);
+
+            // Cabin Roof
+            const roof = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.45, 1.3), glassMat);
+            roof.position.set(-0.2, 0.85, 0);
+            carMesh.add(roof);
+
+            // Wheels
+            const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.3, 16);
+            wheelGeo.rotateX(Math.PI / 2);
+            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+
+            const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.0, 0.35, 0.8);
+            const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(1.0, 0.35, -0.8);
+            const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(-1.0, 0.35, 0.8);
+            const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.0, 0.35, -0.8);
+            carMesh.add(w1, w2, w3, w4);
+
+            scene.add(carMesh);
+            carMesh.position.set(0, -0.8, 0);
+
+            // Touch & Mouse Drag Controls
+            window.addEventListener('pointerdown', e => { isDragging = true; prevX = e.clientX; });
+            window.addEventListener('pointermove', e => {
+                if (isDragging && carMesh) {
+                    const deltaX = e.clientX - prevX;
+                    carMesh.rotation.y += deltaX * 0.01;
+                    prevX = e.clientX;
+                }
+            });
+            window.addEventListener('pointerup', () => isDragging = false);
+
+            animate3D();
+        }
+
+        function setCarColor(hex) {
+            if (carMat) carMat.color.setHex(hex);
+            playChime();
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            if (carMesh && !isDragging) {
+                carMesh.rotation.y += 0.005; // Slow auto rotation
+            }
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+</html>
+
